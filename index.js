@@ -1,11 +1,16 @@
 const WebSocket = require('ws')
 const express = require('express')
 const uuid = require('uuid');
-const PORT = process.env.PORT || 8080
+const { request, response } = require('express');
 const app = express()
+const PORT = process.env.PORT || 8080
 /* const wss = new WebSocket.Server({port: 8080}, ()=>{
     console.log('server iniciado!')
 }) */
+app.get("/", (request, response)=>{
+  response.send('<span style="color": #f00;"> Hello!</span>');
+});
+
 const server = app.listen(PORT, () => {
   console.log(`App Express is running!, port: ${PORT}`);
 })
