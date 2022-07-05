@@ -1,8 +1,16 @@
 const WebSocket = require('ws')
+const express = require('express')
 const uuid = require('uuid');
-const wss = new WebSocket.Server({port: 8080}, ()=>{
+const PORT = process.env.PORT || 8080
+const app = express()
+/* const wss = new WebSocket.Server({port: 8080}, ()=>{
     console.log('server iniciado!')
+}) */
+const server = app.listen(PORT, () => {
+  console.log(`App Express is running!, port: ${PORT}`);
 })
+
+const wss = new WebSocket.Server({ server })
 
 const clients = {}
 let qtdjogadoresingame = 0
@@ -83,6 +91,6 @@ wss.on('connection', (ws)=>{
     })
 })
 
-wss.on('listening', ()=>{
+/* wss.on('listening', , ()=>{
     console.log('server is listening on port 8080')
-})
+}) */
