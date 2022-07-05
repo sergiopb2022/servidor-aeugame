@@ -94,7 +94,20 @@ wss.on('connection', (ws)=>{
     ws.on('close', () => {
         console.log("desconectou!")
     })
-})
+
+    setInterval(function() {
+      wss.clients.forEach(function each(client) {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({
+            type: 'ping',
+          }))
+        }
+      });
+      
+  }, 5000);
+
+  
+  })
 
 /* wss.on('listening', , ()=>{
     console.log('server is listening on port 8080')
