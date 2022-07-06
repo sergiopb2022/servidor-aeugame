@@ -113,7 +113,7 @@ wss.on('connection', (ws)=>{
             break;
             case "spawn-player-reply":
               wss.clients.forEach(function each(client) {
-                if (client !== ws && client.readyState === WebSocket.OPEN) {
+                if (/*client !== ws && */ client.readyState === WebSocket.OPEN) {
                         client.send(JSON.stringify({
                           type: 'spawn-player',
                           id: packet.data,
