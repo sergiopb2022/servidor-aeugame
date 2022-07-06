@@ -96,7 +96,7 @@ wss.on('connection', (ws)=>{
             break;
             case "posicao":
                     wss.clients.forEach(function each(client) {
-                        //console.log("x",(packet.x).toString(),"y",(packet.y).toString(),"z",(packet.z).toString())
+                        console.log(packet.idPlayer,"x",(packet.x).toString(),"y",(packet.y).toString(),"z",(packet.z).toString())
                         if (client !== ws && client.readyState === WebSocket.OPEN) {
                           client.send(JSON.stringify({
                             type: 'posicao-jogadores',
