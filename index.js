@@ -80,11 +80,22 @@ wss.on('connection', (ws)=>{
                             type: 'spawn',
                           }))
                           if(qtdjogadoresingame >= 2){
+                            for(let e in clients) {
+                              if(e.id == playerID){
+                                continue;
+                              }
+                              else{
+                                client.send(JSON.stringify({
+                                  type: 'spawn-player',
+                                  id: e.id,
+                               }))
+                              }
+                            }
                             console.log("2 jogadores na fase1")
-                            client.send(JSON.stringify({
+                            /* client.send(JSON.stringify({
                                 type: 'spawn-player',
                                 id: playerID,
-                             }))
+                             })) */
                             }
                         }
                       });
