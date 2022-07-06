@@ -29,23 +29,15 @@ wss.on('connection', (ws)=>{
     console.log("conectou jogador de ID: "+playerID)
     let size = Object.keys(clients).length;
 
-    wss.clients.forEach(function each(client) {
-      if (client === ws && client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({
+        ws.send(JSON.stringify({
           type: 'idplayer',
           id: playerID,
         }))
-      }
-    });
-
-    wss.clients.forEach(function each(client) {
-      if (client === ws && client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({
+      
+        ws.send(JSON.stringify({
           type: 'partida',
           partida: partidaID,
         }))
-      }
-    });
 
    /*  if(qtdjogadoresingame >1){
         console.log("spawn players!!")
