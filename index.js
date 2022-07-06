@@ -30,7 +30,7 @@ wss.on('connection', (ws)=>{
     let size = Object.keys(clients).length;
 
     wss.clients.forEach(function each(client) {
-      if (client == ws && client.readyState === WebSocket.OPEN) {
+      if (client === ws && client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify({
           type: 'idplayer',
           id: playerID,
@@ -39,7 +39,7 @@ wss.on('connection', (ws)=>{
     });
 
     wss.clients.forEach(function each(client) {
-      if (client == ws && client.readyState === WebSocket.OPEN) {
+      if (client === ws && client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify({
           type: 'partida',
           partida: partidaID,
@@ -104,8 +104,8 @@ wss.on('connection', (ws)=>{
                         if (client !== ws && client.readyState === WebSocket.OPEN) {
                           client.send(JSON.stringify({
                             type: 'posicao-jogadores',
-                            idPlayer: playerID,
-                            idPartida: partidaID,
+                            idPlayer: packet.idPlayer,
+                            idPartida: packet.idPartida,
                             x: (packet.x).toString(),
                             y: (packet.y).toString(),
                             z: (packet.z).toString(),
