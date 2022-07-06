@@ -74,23 +74,16 @@ wss.on('connection', (ws)=>{
                 if(fase == "1"){
                     console.log("entrou no spawn!!")
                     ++qtdjogadoresingame
+                    ws.send(JSON.stringify({
+                      type: 'spawn',
+                    }))
                     wss.clients.forEach(function each(client) {
-                        if (/*client !== ws && */ client.readyState === WebSocket.OPEN) {
-                          client.send(JSON.stringify({
-                            type: 'spawn',
-                          }))
+                        if (client !== ws && client.readyState === WebSocket.OPEN) {
                           if(qtdjogadoresingame >= 2){
-                            for(let e in clients) {
-                              if(e.id == playerID){
-                                continue;
-                              }
-                              else{
                                 client.send(JSON.stringify({
                                   type: 'spawn-player',
-                                  id: e.id,
+                                  id: playerID,
                                }))
-                              }
-                            }
                             console.log("2 jogadores na fase1")
                             /* client.send(JSON.stringify({
                                 type: 'spawn-player',
@@ -117,6 +110,17 @@ wss.on('connection', (ws)=>{
                           }))
                         }
                       });
+            break;
+            case "spawn-player-reply":
+              wss.clients.forEach(function each(client) {
+                if (client !== ws && client.readyState === WebSocket.OPEN) {
+                        client.send(JSON.stringify({
+                          type: 'spawn-player',
+                          id: packet.data,
+                       }))
+                    console.log("2 jogadores na fase1")
+                }
+              });
             break;
         }
         
