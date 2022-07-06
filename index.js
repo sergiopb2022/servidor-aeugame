@@ -79,7 +79,7 @@ wss.on('connection', (ws)=>{
                           client.send(JSON.stringify({
                             type: 'spawn',
                           }))
-                          if(qtdjogadoresingame == 2){
+                          if(qtdjogadoresingame >= 2){
                             console.log("2 jogadores na fase1")
                             client.send(JSON.stringify({
                                 type: 'spawn-player',
