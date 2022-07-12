@@ -87,6 +87,7 @@ wss.on('connection', (ws) => {
               z: (packet.z).toString(),
               ry: (packet.ry).toString(),
               anim: (packet.anim).toString(),
+              vivo: (packet.vivo).toString(),
             }))
           }
         });
