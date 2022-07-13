@@ -20,3 +20,4 @@ heroku ps
 abrir aplicacao no navegador:
 heroku open
 
+versao antiga do node v12.18.1 --> subistituida por v16.16.0
