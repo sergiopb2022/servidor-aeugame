@@ -27,13 +27,16 @@ async function lerDocumentos() {
   });
 }
 
-async function lerUnicoDocumento() {
-  const registroRef = db.collection('registro').doc('nomedocumento');
+async function lerUnicoDocumento(nome, senha) {
+  const registroRef = db.collection('registro').doc(nome);
   const doc = await registroRef.get();
   if (!doc.exists) {
     console.log('No such document!');
+    return false;
   } else {
     console.log('Document data:', doc.data());
+    console.log('senha iguais?', doc.data().senha == senha)
+    return true;
   }
 }
 
@@ -48,14 +51,19 @@ async function AddDocumentoRandomID() {
   lerDocumentos()
 }
 
-async function AddDocumento() {
-  const data = {
-    name: 'Los Angeles',
-    state: 'CA',
-    country: 'USA'
-  };
-  // Add a new document in collection "cities" with ID 'LA'
-  const res = await db.collection('cities').doc('LA').set(data);
+async function AddDocumento(nome, email, senha) {
+  let check = await lerUnicoDocumento(nome, senha)
+  if(check){
+    console.log('o nome já existe!')
+  }
+  else{
+    const data = {
+      email: email,
+      senha: senha,
+    };
+    // Add a new document in collection "cities" with ID 'LA'
+    const res = await db.collection('registro').doc(nome).set(data);
+  }
 }
 
 
@@ -145,6 +153,17 @@ wss.on('connection', (ws) => {
             }))
           }
         });
+        break;
+      case "cadastro":
+        console.log(packet.nome)
+        console.log(packet.email)
+        console.log(packet.senha)
+        AddDocumento(packet.nome, packet.email, packet.senha)
+        break;
+      case "login":
+        console.log(packet.nome)
+        console.log(packet.senha)
+        lerUnicoDocumento(packet.nome, packet.senha)
         break;
     }
 
