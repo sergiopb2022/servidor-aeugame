@@ -40,6 +40,24 @@ async function lerUnicoDocumento(nome, senha) {
   }
 }
 
+async function FazerLogin(nome, senha) {
+  const registroRef = db.collection('registro').doc(nome);
+  const doc = await registroRef.get();
+  if (!doc.exists) {
+    console.log('No such document!');
+    return false;
+  } else {
+    console.log('Document data:', doc.data());
+    if(doc.data().senha == senha){
+    console.log('senha ok')
+    return true;
+    }
+    else{
+      return false;
+    }
+  }
+}
+
 async function AddDocumentoRandomID() {
   // Add a new document with a generated id.
   const res = await db.collection('registro').add({
@@ -63,6 +81,7 @@ async function AddDocumento(nome, email, senha) {
     };
     // Add a new document in collection "cities" with ID 'LA'
     const res = await db.collection('registro').doc(nome).set(data);
+    console.log('dados enviados! com nome:', nome)
   }
 }
 
@@ -98,6 +117,22 @@ wss.on('connection', (ws) => {
     type: 'partida',
     partida: partidaID,
   }))
+
+  async function replayLogin(nome, senha) {
+    let l = await FazerLogin(nome, senha)
+        if(l){
+          ws.send(JSON.stringify({
+            type: 'enter-lobby',
+            id: playerID,
+          }))
+        }
+        else{
+          ws.send(JSON.stringify({
+            type: 'login-error',
+            id: playerID,
+          }))
+        }
+  }
 
   ws.on('message', (data) => {
     const packet = JSON.parse(data); // Converte Para Objeto
@@ -163,7 +198,17 @@ wss.on('connection', (ws) => {
       case "login":
         console.log(packet.nome)
         console.log(packet.senha)
-        lerUnicoDocumento(packet.nome, packet.senha)
+        replayLogin(packet.nome, packet.senha)
+        break;
+      case "chat-global":
+        wss.clients.forEach(function each(client) {
+          if (/*client !== ws && */ client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({
+              type: 'chat-g',
+              data: packet.data,
+            }))
+          }
+        });
         break;
     }
 
