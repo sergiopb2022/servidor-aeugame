@@ -207,6 +207,7 @@ wss.on('connection', (ws) => {
             client.send(JSON.stringify({
               type: 'chat-g',
               data: packet.data,
+              nome: packet.nome,
             }))
           }
         });
