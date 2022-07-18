@@ -154,7 +154,7 @@ wss.on('connection', (ws) => {
           client.send(JSON.stringify({
             type: 'sala-criada',
             nome: partidas[partidaID].nome,
-            qtdPlayers: partidas[partidaID].players.length,
+            qtdPlayers: partidas[partidaID].players.length.toString(),
           }))
         }
       });
