@@ -145,7 +145,7 @@ wss.on('connection', (ws) => {
     }
     if(!c){
       let vplayers = []
-      vplayers.add(id)
+      vplayers.push(id)
       let partidaID = uuid.v4();
       partidas[partidaID] = { nome: nome, players: vplayers }
       console.log("partidaID:" +partidaID+", data:"+ partidas[partidaID])
@@ -154,7 +154,7 @@ wss.on('connection', (ws) => {
           client.send(JSON.stringify({
             type: 'sala-criada',
             nome: partidas[partidaID].nome,
-            qtdPlayers: partidas[partidaID].players.size(),
+            qtdPlayers: partidas[partidaID].players.length,
           }))
         }
       });
