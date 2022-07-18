@@ -135,6 +135,36 @@ wss.on('connection', (ws) => {
         }
   }
 
+  function criarSala(nome, id){
+    let c = false
+    for(e in partidas){
+      if(e.nome == nome){
+      c = true
+      break;
+      }
+    }
+    if(!c){
+      let vplayers = []
+      vplayers.add(id)
+      let partidaID = uuid.v4();
+      partidas[partidaID] = { nome: nome, players: vplayers }
+      console.log("partidaID:" +partidaID+", data:"+ partidas[partidaID])
+      wss.clients.forEach(function each(client) {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({
+            type: 'sala-criada',
+            nome: partidas[partidaID].nome,
+            qtdPlayers: partidas[partidaID].players.size(),
+          }))
+        }
+      });
+    }
+    else{
+      console.log("essa sala já existe!")
+    }
+    
+  }
+
   ws.on('message', (data) => {
     const packet = JSON.parse(data); // Converte Para Objeto
     //console.log('jsonParseData:'+packet.data)
@@ -211,6 +241,9 @@ wss.on('connection', (ws) => {
             }))
           }
         });
+        break;
+      case "criar-sala":
+        criarSala(packet.nome,packet.id)
         break;
     }
 
