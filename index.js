@@ -124,6 +124,7 @@ wss.on('connection', (ws) => {
           ws.send(JSON.stringify({
             type: 'enter-lobby',
             id: playerID,
+            nome: nome,
           }))
         }
         else{
