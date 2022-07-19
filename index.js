@@ -138,8 +138,8 @@ wss.on('connection', (ws) => {
   function criarSala(nome, id){
     let c = false
     for(e in partidas){
-      console.log("nome atual:"+e.nome+", nomeparametro:"+nome)
-      if(e.nome == nome){
+      console.log("nome atual:"+partidas[e].nome+", nomeparametro:"+nome)
+      if(partidas[e].nome == nome){
       c = true
       break;
       }
