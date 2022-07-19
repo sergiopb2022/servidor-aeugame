@@ -99,6 +99,7 @@ const wss = new WebSocket.Server({ server })
 const clients = {}
 const partidas = {}
 const partidaID = uuid.v4(); //teste
+const tamanhoMaxPlayers = 4
 
 let qtdjogadoresingame = 0
 
@@ -251,6 +252,25 @@ wss.on('connection', (ws) => {
           type: 'todas-salas',
           salas: partidas,
         }))
+        break;
+      case "entrar-na-sala":
+        for (const key in partidas) {
+          if(partidas[key].nome == packet.sala){
+            if(partidas[key].players.length < tamanhoMaxPlayers){
+              partidas[key].players.push(packet.id)
+              ws.send(JSON.stringify({
+                type: 'jogador-pode-entrar',
+              }))
+              break;
+            }
+            else{
+              ws.send(JSON.stringify({
+                type: 'jogador-nao-pode-entrar',
+              }))
+              break;
+            }
+          }
+        }
         break;
     }
 
