@@ -147,7 +147,7 @@ wss.on('connection', (ws) => {
     }
     if(!c){
       let vplayers = []
-      vplayers.push(id)
+      //vplayers.push(id)
       let partidaID = uuid.v4();
       partidas[partidaID] = { nome: nome, players: vplayers }
       console.log("partidaID:" +partidaID+", data:"+ partidas[partidaID])
