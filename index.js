@@ -245,6 +245,12 @@ wss.on('connection', (ws) => {
       case "criar-sala":
         criarSala(packet.nome,packet.id)
         break;
+      case "status-salas":
+        ws.send(JSON.stringify({
+          type: 'todas-salas',
+          salas: partidas,
+        }))
+        break;
     }
 
   })
