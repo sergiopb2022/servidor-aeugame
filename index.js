@@ -98,25 +98,21 @@ const wss = new WebSocket.Server({ server })
 
 const clients = {}
 const partidas = {}
-const partidaID = uuid.v4(); //teste
+const partidasWS = {}
 const tamanhoMaxPlayers = 4
 
 let qtdjogadoresingame = 0
 
 wss.on('connection', (ws) => {
+  let idpartidaWS = ""
   let playerID = uuid.v4();
-  clients[playerID] = { id: playerID }
+  clients[playerID] = { id: playerID, websocket: ws}
   console.log("conectou jogador de ID: " + playerID)
   let size = Object.keys(clients).length;
 
   ws.send(JSON.stringify({
     type: 'idplayer',
     id: playerID,
-  }))
-
-  ws.send(JSON.stringify({
-    type: 'partida',
-    partida: partidaID,
   }))
 
   async function replayLogin(nome, senha) {
@@ -147,9 +143,11 @@ wss.on('connection', (ws) => {
     }
     if(!c){
       let vplayers = []
+      let vplayersWS = []
       //vplayers.push(id)
       let partidaID = uuid.v4();
       partidas[partidaID] = { nome: nome, players: vplayers }
+      partidasWS[partidaID] = {nome: nome, playersWS : vplayersWS}
       console.log("partidaID:" +partidaID+", data:"+ partidas[partidaID])
       wss.clients.forEach(function each(client) {
         if (client.readyState === WebSocket.OPEN) {
@@ -189,23 +187,56 @@ wss.on('connection', (ws) => {
           ws.send(JSON.stringify({
             type: 'spawn',
           }))
-          wss.clients.forEach(function each(client) {
-            if (/*client !== ws && */ client.readyState === WebSocket.OPEN) {
+          console.log("spawn enviado!")
+          if(partidas[packet.partidaid] != null && partidas[packet.partidaid] != undefined){
+            for(e in partidasWS[packet.partidaid].playersWS){
+              //if(partidasWS[packet.partidaid].playersWS[e].websock !== ws){
+              partidasWS[packet.partidaid].playersWS[e].websock.send(JSON.stringify({
+                type: 'spawn-player',
+                pid: playerID,
+                objeto: partidas[packet.partidaid],
+              }))
+            
+            }
+            }
+          /* wss.clients.forEach(function each(client) {
+            if (//client !== ws && client.readyState === WebSocket.OPEN) {
               //if (qtdjogadoresingame >= 2) {
               client.send(JSON.stringify({
                 type: 'spawn-player',
-                id: playerID,
-                idpart: partidaID,
-                objeto: clients,
+                pid: playerID,
+                objeto: partidas[packet.partidaid],
+                //objeto: clients,==========
               }))
-              console.log("2 jogadores na fase1")
+              console.log("partidaIDKey:"+packet.partidaid+", partidas[packet-partidaid]:"+partidas[packet.partidaid])
               //}
             }
-          });
+          }); */
         }
         break;
       case "posicao":
-        wss.clients.forEach(function each(client) {
+         if(partidas[packet.idPartida] != null && partidas[packet.idPartida] != undefined){
+          for(e in partidasWS[packet.idPartida].playersWS){
+            if(partidasWS[packet.idPartida].playersWS[e].websock !== ws){
+            partidasWS[packet.idPartida].playersWS[e].websock.send(JSON.stringify({
+              type: 'posicao-jogadores',
+              idPlayer: packet.idPlayer,
+              idPartida: packet.idPartida,
+              x: (packet.x).toString(),
+              y: (packet.y).toString(),
+              z: (packet.z).toString(),
+              ry: (packet.ry).toString(),
+              anim: (packet.anim).toString(),
+              vivo: (packet.vivo).toString(),
+            }))
+          }
+          }
+          }
+          else{
+            console.log("partidasVetorplayers:NullorUndefined!")
+          }
+
+       /*  wss.clients.forEach(function each(client) {
           //console.log(packet.idPlayer, "x", (packet.x).toString(), "y", (packet.y).toString(), "z", (packet.z).toString())
           if (client !== ws && client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify({
@@ -220,7 +251,7 @@ wss.on('connection', (ws) => {
               vivo: (packet.vivo).toString(),
             }))
           }
-        });
+        }); */
         break;
       case "cadastro":
         console.log(packet.nome)
@@ -256,11 +287,15 @@ wss.on('connection', (ws) => {
       case "entrar-na-sala":
         for (const key in partidas) {
           if(partidas[key].nome == packet.sala){
+            console.log("entrar-sala-nome:"+packet.sala)
             if(partidas[key].players.length < tamanhoMaxPlayers){
               partidas[key].players.push(packet.id)
+              partidasWS[key].playersWS.push({websock:clients[packet.id].websocket, idplay: packet.id})
               ws.send(JSON.stringify({
                 type: 'jogador-pode-entrar',
+                idSala: key,
               }))
+              idpartidaWS = key
               break;
             }
             else{
@@ -278,6 +313,21 @@ wss.on('connection', (ws) => {
 
   ws.on('close', () => {
     delete clients[playerID];
+    console.log("antes-partidasWS.playerWS[]:"+partidasWS[idpartidaWS].playersWS)
+    for(e in partidasWS[idpartidaWS].playersWS){
+      if(partidasWS[idpartidaWS].playersWS[e].idplay == playerID){
+        delete partidasWS[idpartidaWS].playersWS[e]
+        break;
+      }
+    }
+    for(e in partidas[idpartidaWS].players){
+      if(partidas[idpartidaWS].players[e] == playerID){
+        delete partidas[idpartidaWS].players[e]
+        break;
+      }
+    }
+
+    console.log("depois-partidasWS.playerWS[]:"+partidasWS[idpartidaWS].playersWS)
     console.log("player:" + playerID + " desconectou!")
     wss.clients.forEach(function each(client) {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
