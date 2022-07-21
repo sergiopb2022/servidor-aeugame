@@ -96,9 +96,9 @@ const server = app.listen(PORT, () => {
 
 const wss = new WebSocket.Server({ server })
 
-const clients = {}
-const partidas = {}
-const partidasWS = {}
+let clients = {}
+let partidas = {}
+let partidasWS = {}
 const tamanhoMaxPlayers = 4
 
 let qtdjogadoresingame = 0
@@ -313,21 +313,27 @@ wss.on('connection', (ws) => {
 
   ws.on('close', () => {
     delete clients[playerID];
-    console.log("antes-partidasWS.playerWS[]:"+partidasWS[idpartidaWS].playersWS)
-    for(e in partidasWS[idpartidaWS].playersWS){
-      if(partidasWS[idpartidaWS].playersWS[e].idplay == playerID){
-        delete partidasWS[idpartidaWS].playersWS[e]
-        break;
+    try{
+      console.log("antes-partidasWS.playerWS[]:"+partidasWS[idpartidaWS].playersWS)
+      for(e in partidasWS[idpartidaWS].playersWS){
+        if(partidasWS[idpartidaWS].playersWS[e].idplay == playerID){
+          //delete partidasWS[idpartidaWS].playersWS[e]
+          partidasWS[idpartidaWS].playersWS.splice(e,1)
+          break;
+        }
       }
-    }
-    for(e in partidas[idpartidaWS].players){
-      if(partidas[idpartidaWS].players[e] == playerID){
-        delete partidas[idpartidaWS].players[e]
-        break;
+      for(e in partidas[idpartidaWS].players){
+        if(partidas[idpartidaWS].players[e] == playerID){
+          //delete partidas[idpartidaWS].players[e]
+          partidas[idpartidaWS].players.splice(e,1)
+          break;
+        }
       }
+      console.log("depois-partidasWS.playerWS[]:"+partidasWS[idpartidaWS].playersWS)
     }
-
-    console.log("depois-partidasWS.playerWS[]:"+partidasWS[idpartidaWS].playersWS)
+    catch(e){
+      console.log("Erro: provavelmente acesso undefined detectado! continuando...")
+    }
     console.log("player:" + playerID + " desconectou!")
     wss.clients.forEach(function each(client) {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
